@@ -4,36 +4,43 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"task-management/models"
 
-	"github.com/joho/godotenv"
+	"github.com/joho/godotenv" // For loading .env file
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 var DB *gorm.DB
 
+// ConnectDatabase initializes the database connection and performs migrations
 func ConnectDatabase() {
-	// Load .env file
+	// Load environment variables
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
-	// Get the PostgreSQL connection URL
-	db_url := os.Getenv("POSTGRES_URL")
-
-	if db_url == "" {
-		log.Fatal("POSTGRES_URL not set in environment")
+	// Read PostgreSQL connection details from the environment
+	dsn := os.Getenv("POSTGRES_URL")
+	if dsn == "" {
+		log.Fatal("POSTGRES_URL is not set in the environment")
 	}
 
-	fmt.Println("db url =>>>>>>>>>>", db_url)
-
-	// Connect to the database
-	db, err := gorm.Open(postgres.Open(db_url), &gorm.Config{})
+	// Connect to the PostgreSQL database
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatal("Failed to connect to database: ", err)
+		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
+	// Assign the global DB instance
 	DB = db
-	fmt.Println("Database connected successfully!")
+
+	// Run migrations
+	err = DB.AutoMigrate(&models.User{})
+	if err != nil {
+		log.Fatalf("Failed to run migrations: %v", err)
+	}
+
+	fmt.Println("Database connected and migrations completed successfully!")
 }
