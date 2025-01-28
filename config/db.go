@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"task-management/models"
 
 	"github.com/joho/godotenv" // For loading .env file
 	"gorm.io/driver/postgres"
@@ -37,10 +36,10 @@ func ConnectDatabase() {
 	DB = db
 
 	// Run migrations
-	err = DB.AutoMigrate(&models.User{})
-	if err != nil {
-		log.Fatalf("Failed to run migrations: %v", err)
-	}
+	// err = DB.AutoMigrate(&models.User{})
+	// if err != nil {
+	// 	log.Fatalf("Failed to run migrations: %v", err)
+	// }
 
 	fmt.Println("Database connected and migrations completed successfully!")
 }
